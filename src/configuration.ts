@@ -9,7 +9,7 @@ import { catching } from "lib/result.ts";
 //
 // Return an error if could not succeed for any reason.
 //
-export function loadDevelopmentConfiguration(): void | Error {
+export function loadDevelopmentConfiguration(): undefined | Error {
   const json = catching(() => Deno.readTextFileSync("./secrets.jsonc"));
   if (json instanceof Error)
     return new Error("./secrets.jsonc could not be read.");

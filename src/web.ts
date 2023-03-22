@@ -11,7 +11,7 @@ export type Context = {
 
 export type Params = { [key: string]: string };
 
-// export type Capabilities = {};
+// export type Effects = {};
 export type Effects = Record<string, never>;
 
 export type Handler = (context: Context) => Promise<Response> | Response;
@@ -34,8 +34,9 @@ export async function handleRequest(
 }
 
 function home(_context: Context): Response {
-  return new Response("Welcome home.", { status: 200 });
+  return new Response("Hello there! Good to see you!", { status: 200 });
 }
+
 function greet(context: Context): Response {
   return new Response(`Hello, ${context.params.name}!`, { status: 404 });
 }

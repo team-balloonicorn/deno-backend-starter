@@ -9,5 +9,4 @@ if (error) {
   Deno.exit(1);
 }
 
-const module = await import("./src/main.ts");
-module.main();
+await import("./src/main.ts");
