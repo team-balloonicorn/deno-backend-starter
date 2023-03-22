@@ -2,11 +2,8 @@
   "imports": {
     "src/": "./src/",
     "lib/": "./lib/",
-    "preact": "https://esm.sh/preact@10.11.0",
-    "preact/": "https://esm.sh/preact@10.11.0/",
-    "preact-render-to-string": "https://esm.sh/*preact-render-to-string@5.2.4",
-    "@preact/signals": "https://esm.sh/*@preact/signals@1.0.3",
-    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.0.1",
-    "std/": "https://deno.land/std@0.180.0/"
+    "std/": "https://deno.land/std@0.180.0/",
+    "jsx": "https://deno.land/x/jsx@v0.1.5/mod.ts",
+    "jsx/jsx-runtime": "https://deno.land/x/jsx@v0.1.5/mod.ts"
   }
 }

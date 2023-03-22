@@ -1,4 +1,4 @@
-import { Effects } from "src/web.ts";
+import { Effects } from "src/web.tsx";
 
 export const effects: Effects = Object.seal({});
 

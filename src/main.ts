@@ -1,5 +1,5 @@
 import { serve } from "std/http/server.ts";
-import { handleRequest } from "src/web.ts";
+import { handleRequest } from "src/web.tsx";
 
 const port = 8000;
 const effects = {};

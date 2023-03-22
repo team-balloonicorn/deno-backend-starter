@@ -1,4 +1,6 @@
+import { h, Node, renderToString } from "jsx";
 import { serveDir } from "std/http/file_server.ts";
+import { Status } from "std/http/http_status.ts";
 import { info } from "src/log.ts";
 
 const routes: Array<[URLPattern, Handler]> = Object.entries({
@@ -22,7 +24,7 @@ export type Handler = (context: Context) => Promise<Response> | Response;
 
 export async function handleRequest(
   request: Request,
-  effects: Effects
+  effects: Effects,
 ): Promise<Response> {
   const before = Date.now();
   const response = await router(request, effects);
@@ -38,7 +40,7 @@ export async function handleRequest(
 
 export async function router(
   request: Request,
-  effects: Effects
+  effects: Effects,
 ): Promise<Response> {
   const context: Context = { request, effects, params: {} };
 
@@ -55,19 +57,28 @@ export async function router(
   return notFound(context);
 }
 
-function home(_context: Context): Response {
-  return new Response("Hello there! Good to see you!", { status: 200 });
+async function html(
+  status: Status,
+  node: Node,
+  headers: Headers = new Headers(),
+): Promise<Response> {
+  headers.set("content-type", "text/html; charset=utf-8");
+  return new Response(await renderToString(node), { status, headers });
 }
 
-function greet(context: Context): Response {
-  return new Response(`Hello, ${context.params.name}!`, { status: 404 });
+function home(_context: Context) {
+  return html(200, <div>Hello there!</div>);
 }
 
-export function notFound(_context: Context): Response {
-  return new Response("There's nothing here...", { status: 404 });
+function greet(context: Context) {
+  return html(200, <div>Hello, {context.params.name}!</div>);
 }
 
-function staticFile(context: Context): Promise<Response> {
+export function notFound(_context: Context) {
+  return html(404, <div>There's nothing here...</div>);
+}
+
+function staticFile(context: Context) {
   // https://deno.land/std@0.180.0/http/file_server.ts?s=ServeDirOptions
   return serveDir(context.request, {
     fsRoot: "static",

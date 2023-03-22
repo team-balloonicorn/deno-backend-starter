@@ -6,6 +6,7 @@ A starter project for building a backend with Deno. It features:
 - Testing of HTTP functinality.
 - Reloading in development.
 - Serving of static files.
+- Rendering of JSX HTML templates.
 - A logger and logging of HTTP requests.
 - Dependency injection of effects to help with testing.
 - Loading of development secrets from a git-ignored `secrets.jsonc` file.
@@ -15,6 +16,7 @@ A starter project for building a backend with Deno. It features:
 - [Quick reference](#quick-reference)
 - [Code principles](#code-principles)
 - [Development setup](#development-setup)
+- [Dependencies](#dependencies)
 - [Deployment](#deployment)
 - [Environment variables](#environment-variables)
 
@@ -78,6 +80,12 @@ You will need the following installed:
 
 - [Deno](https://deno.land/)
 
+
+## Dependencies
+
+- [The Deno standard libary](https://deno.land/std). (MIT)
+- [JSX](https://deno.land/x/jsx@v0.1.5), a micro templating library.
+  (MIT)
 
 ## Deployment
 

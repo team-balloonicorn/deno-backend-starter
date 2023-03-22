@@ -1,6 +1,6 @@
 import { assertEquals, assertStringIncludes } from "std/testing/asserts.ts";
-import { handleRequest } from "src/web.ts";
-import { newRequest, effects } from "./helpers.ts";
+import { handleRequest } from "src/web.tsx";
+import { effects, newRequest } from "./helpers.ts";
 
 Deno.test("GET /", async () => {
   const request = newRequest("/");
