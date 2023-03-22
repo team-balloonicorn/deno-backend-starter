@@ -20,6 +20,7 @@ A starter project for building a backend with Deno. It features:
 
 ```sh
 deno task start
+deno task test
 ```
 
 
