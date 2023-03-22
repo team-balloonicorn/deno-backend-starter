@@ -5,6 +5,7 @@ A starter project for building a backend with Deno. It features:
 - Routing of HTTP requests.
 - Testing of HTTP functinality.
 - Reloading in development.
+- Serving of static files.
 - Dependency injection of effects to help with testing.
 - Loading of development secrets from a git-ignored `secrets.jsonc` file.
 

@@ -28,3 +28,9 @@ Deno.test("GET /static/unknown", async () => {
   const response = await handleRequest(request, effects);
   assertEquals(response.status, 404);
 });
+
+Deno.test("GET /static/../deno.json", async () => {
+  const request = newRequest("/static/../deno.json");
+  const response = await handleRequest(request, effects);
+  assertEquals(response.status, 404);
+});
