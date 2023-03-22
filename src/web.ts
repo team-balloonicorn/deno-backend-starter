@@ -1,4 +1,5 @@
 import { serveDir } from "std/http/file_server.ts";
+import { info } from "src/log.ts";
 
 const routes: Array<[URLPattern, Handler]> = Object.entries({
   "/": home,
@@ -20,6 +21,22 @@ export type Effects = Record<string, never>;
 export type Handler = (context: Context) => Promise<Response> | Response;
 
 export async function handleRequest(
+  request: Request,
+  effects: Effects
+): Promise<Response> {
+  const before = Date.now();
+  const response = await router(request, effects);
+
+  info({
+    status: response.status,
+    method: request.method,
+    url: request.url,
+    ms: Date.now() - before,
+  });
+  return response;
+}
+
+export async function router(
   request: Request,
   effects: Effects
 ): Promise<Response> {

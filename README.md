@@ -6,6 +6,7 @@ A starter project for building a backend with Deno. It features:
 - Testing of HTTP functinality.
 - Reloading in development.
 - Serving of static files.
+- A logger and logging of HTTP requests.
 - Dependency injection of effects to help with testing.
 - Loading of development secrets from a git-ignored `secrets.jsonc` file.
 
