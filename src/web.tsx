@@ -31,6 +31,7 @@ export async function handleRequest(
   const response = await router(request, effects);
 
   info({
+    event: "responded",
     status: response.status,
     method: request.method,
     url: request.url,

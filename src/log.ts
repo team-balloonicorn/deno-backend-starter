@@ -1,9 +1,9 @@
 import { blue, bold, red, yellow } from "std/fmt/colors.ts";
-import { LogLevels, LevelName, getLevelName } from "std/log/levels.ts";
+import { getLevelName, LevelName, LogLevels } from "std/log/levels.ts";
 
 export { LogLevels } from "std/log/mod.ts";
 
-export type LogData = string | Record<string, LogDatum>;
+export type LogData = string | { event: string; [key: string]: LogDatum };
 export type LogDatum = string | number | Date;
 
 const currentLevel = Deno.env.get("APP_TEST")
@@ -34,7 +34,7 @@ function getColourWrapper(level: LogLevels) {
 function makeLogFunction(level: LogLevels) {
   const name = getLevelName(level);
   const wrapper = getColourWrapper(level);
-  return (data: LogData | (() => LogData) = {}) => {
+  return (data: LogData | (() => LogData)) => {
     log(level, name, wrapper, data);
   };
 }
@@ -43,7 +43,7 @@ function log(
   level: LogLevels,
   levelName: LevelName,
   wrapper: (s: string) => string,
-  data: LogData | (() => LogData) = {}
+  data: LogData | (() => LogData),
 ) {
   if (level < currentLevel) return;
 
@@ -53,7 +53,7 @@ function log(
 
   let output = levelName;
   if (typeof realisedData === "string") {
-    output += ` message=${JSON.stringify(realisedData)}`;
+    output += ` event=${JSON.stringify(realisedData)}`;
   } else {
     for (const [key, value] of Object.entries(realisedData)) {
       output += ` ${key}=${JSON.stringify(value)}`;

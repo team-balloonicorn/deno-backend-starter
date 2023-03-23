@@ -25,6 +25,7 @@ A starter project for building a backend with Deno. It features:
 ```sh
 deno task start
 deno task test
+deno task repl
 ```
 
 
@@ -102,4 +103,7 @@ these will be loaded from `./secrets.env`. The `./secrets-example.env` can
 be used as a base when creating this file.
 
 - `SIGNING_SECRET`: A secret used to sign sessions.
-
+- `ZEPTOMAIL_API_KEY`: API key from https://zeptomail.zoho.com/.
+- `EMAIL_FROM_NAME`: Name to use in the "from" field of sent emails.
+- `EMAIL_FROM_ADDRESS`: Email address to use in the "from" field of sent emails.
+  Must be a verified address in Zeptomail.

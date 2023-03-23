@@ -9,4 +9,6 @@ await load({
   export: true,
 });
 
-await import("./src/main.ts");
+if (import.meta.main) {
+  await import("./src/main.ts");
+}
