@@ -1,12 +1,12 @@
 #!/usr/bin/env -S deno run -A --watch=static/,routes/
 
-import { loadDevelopmentConfiguration } from "./src/configuration.ts";
+import { load } from "std/dotenv/mod.ts";
 
 // Load development secrets into environment variables
-const error = loadDevelopmentConfiguration();
-if (error) {
-  console.error("ERROR: " + error.message);
-  Deno.exit(1);
-}
+await load({
+  envPath: "./secrets.env",
+  examplePath: "./secrets-example.env",
+  export: true,
+});
 
 await import("./src/main.ts");

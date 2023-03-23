@@ -2,6 +2,7 @@ import { h, Node, renderToString } from "jsx";
 import { serveDir } from "std/http/file_server.ts";
 import { Status } from "std/http/http_status.ts";
 import { info } from "src/log.ts";
+import { JsonValue } from "std/json/mod.ts";
 
 const routes: Array<[URLPattern, Handler]> = Object.entries({
   "/": home,
@@ -57,13 +58,22 @@ export async function router(
   return notFound(context);
 }
 
-async function html(
+export async function html(
   status: Status,
   node: Node,
   headers: Headers = new Headers(),
 ): Promise<Response> {
   headers.set("content-type", "text/html; charset=utf-8");
   return new Response(await renderToString(node), { status, headers });
+}
+
+export function json(
+  status: Status,
+  json: JsonValue,
+  headers: Headers = new Headers(),
+): Response {
+  headers.set("content-type", "application/json; charset=utf-8");
+  return new Response(JSON.stringify(json), { status, headers });
 }
 
 function home(_context: Context) {

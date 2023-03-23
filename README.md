@@ -3,13 +3,13 @@
 A starter project for building a backend with Deno. It features:
 
 - Routing of HTTP requests.
-- Testing of HTTP functinality.
+- Testing of HTTP functionality.
 - Reloading in development.
 - Serving of static files.
 - Rendering of JSX HTML templates.
 - A logger and logging of HTTP requests.
 - Dependency injection of effects to help with testing.
-- Loading of development secrets from a git-ignored `secrets.jsonc` file.
+- Loading of development secrets from a git-ignored `secrets.env` file.
 
 ## Table of contents
 
@@ -80,6 +80,9 @@ You will need the following installed:
 
 - [Deno](https://deno.land/)
 
+Copy `./secrets-example.env` to `./secrets.env` and fill in the values as
+directed by the comments.
+
 
 ## Dependencies
 
@@ -95,8 +98,8 @@ TODO
 ## Environment variables
 
 The application is configured using environment variables, and in development
-these will be loaded from `./secrets.jsonc`. The `./secrets-example.jsonc` can
+these will be loaded from `./secrets.env`. The `./secrets-example.env` can
 be used as a base when creating this file.
 
-- `APPLICTION_KEY`: A secret used to sign sessions.
+- `SIGNING_SECRET`: A secret used to sign sessions.
 
