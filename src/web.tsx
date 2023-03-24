@@ -1,7 +1,7 @@
 import { h, Node, renderToString } from "jsx";
 import { serveDir } from "std/http/file_server.ts";
 import { Status } from "std/http/http_status.ts";
-import { info } from "src/log.ts";
+import { logInfo } from "src/log.ts";
 import { JsonValue } from "std/json/mod.ts";
 
 const routes: Array<[URLPattern, Handler]> = Object.entries({
@@ -30,7 +30,7 @@ export async function handleRequest(
   const before = Date.now();
   const response = await router(request, effects);
 
-  info({
+  logInfo({
     event: "responded",
     status: response.status,
     method: request.method,

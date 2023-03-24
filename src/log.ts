@@ -1,5 +1,6 @@
 import { blue, bold, red, yellow } from "std/fmt/colors.ts";
 import { getLevelName, LevelName, LogLevels } from "std/log/levels.ts";
+import { assertNever, stringifyJson } from "../lib/mod.ts";
 
 export { LogLevels } from "std/log/mod.ts";
 
@@ -10,11 +11,11 @@ const currentLevel = Deno.env.get("APP_TEST")
   ? LogLevels.ERROR
   : LogLevels.INFO;
 
-export const debug = makeLogFunction(LogLevels.DEBUG);
-export const info = makeLogFunction(LogLevels.INFO);
-export const warning = makeLogFunction(LogLevels.WARNING);
-export const error = makeLogFunction(LogLevels.ERROR);
-export const critical = makeLogFunction(LogLevels.CRITICAL);
+export const logDebug = makeLogFunction(LogLevels.DEBUG);
+export const logInfo = makeLogFunction(LogLevels.INFO);
+export const logWarning = makeLogFunction(LogLevels.WARNING);
+export const logError = makeLogFunction(LogLevels.ERROR);
+export const logCritical = makeLogFunction(LogLevels.CRITICAL);
 
 function getColourWrapper(level: LogLevels) {
   switch (level) {
@@ -53,12 +54,24 @@ function log(
 
   let output = levelName;
   if (typeof realisedData === "string") {
-    output += ` event=${JSON.stringify(realisedData)}`;
+    output += ` event=${formatDatum(realisedData)}`;
   } else {
     for (const [key, value] of Object.entries(realisedData)) {
-      output += ` ${key}=${JSON.stringify(value)}`;
+      output += ` ${key}=${formatDatum(value)}`;
     }
   }
 
   console.log(wrapper(output));
+}
+
+function formatDatum(datum: LogDatum): string {
+  if (typeof datum === "string") {
+    return stringifyJson(datum);
+  } else if (typeof datum === "number") {
+    return datum.toString();
+  } else if (datum instanceof Date) {
+    return datum.toISOString();
+  } else {
+    assertNever(datum);
+  }
 }

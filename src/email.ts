@@ -1,6 +1,7 @@
 import { JsonValue } from "std/json/mod.ts";
 import { Config } from "src/config.ts";
-import { error, info } from "src/log.ts";
+import { logError, logInfo } from "src/log.ts";
+import { stringifyJson } from "lib/mod.ts";
 
 class EmailSendingError extends Error {
   constructor(message: string) {
@@ -28,7 +29,7 @@ export async function sendEmail(
       "content-type": "application/json",
       "authorization": config.zeptomailApiKey,
     },
-    body: JSON.stringify(emailJson(config, email)),
+    body: stringifyJson(emailJson(config, email)),
   });
 
   if (response.ok) {
@@ -39,7 +40,7 @@ export async function sendEmail(
 }
 
 function emailSent(email: Email) {
-  info({
+  logInfo({
     event: "email-sent",
     emailSubject: email.subject,
     emailToName: email.toName,
@@ -64,7 +65,7 @@ async function emailFailed(
   response: Response,
 ): Promise<EmailSendingError> {
   const body = await response.text();
-  error({
+  logError({
     event: "email-send-failed",
     emailSubject: email.subject,
     emailToName: email.toName,
