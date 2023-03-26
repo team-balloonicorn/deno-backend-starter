@@ -2,8 +2,9 @@
 
 A starter project for building a backend with Deno. It features:
 
+- A PostgreSQL database.
 - Routing of HTTP requests.
-- Testing of HTTP functionality.
+- Testing.
 - Reloading in development.
 - Serving of static files.
 - Rendering of JSX HTML templates.
@@ -80,6 +81,16 @@ The best dependency is no dependency. Consider inlining code instead.
 You will need the following installed:
 
 - [Deno](https://deno.land/)
+- PostgreSQL
+  - User: `postgres`
+  - Password: `postgres`
+
+Create the databases:
+
+```sh
+createdb deno_starter
+createdb deno_starter_test
+```
 
 Copy `./secrets-example.env` to `./secrets.env` and fill in the values as
 directed by the comments.
