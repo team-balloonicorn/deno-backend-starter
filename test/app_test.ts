@@ -1,6 +1,25 @@
 import { assertEquals, assertStringIncludes } from "std/testing/asserts.ts";
 import { handleRequest } from "src/web.tsx";
-import { effects, newRequest } from "./helpers.ts";
+import { databaseTest, effects, newRequest } from "./helpers.ts";
+
+databaseTest("other database connection", async (db) => {
+  // We are using the correct database
+  const name = await db.query("SELECT current_database() AS name");
+  assertEquals(name, [{ name: "deno_starter_test" }]);
+
+  assertEquals(
+    await db.query("select 1 as it"),
+    [{ it: 1 }],
+  );
+  assertEquals(
+    await db.query("select 2 as it"),
+    [{ it: 2 }],
+  );
+  assertEquals(
+    await db.query("select 3 as it"),
+    [{ it: 3 }],
+  );
+});
 
 Deno.test("GET /", async () => {
   const request = newRequest("/");

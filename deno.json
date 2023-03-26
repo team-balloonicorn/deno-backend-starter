@@ -2,8 +2,8 @@
   "tasks": {
     "start": "deno run --allow-env --allow-read=. --allow-net --watch dev.ts",
     "repl": "deno repl --allow-env --allow-read=. --allow-net --eval 'import \"./dev.ts\";'",
-    "test": "APP_TEST=1 deno test --allow-env --allow-read=static --watch",
-    "test-once": "deno test --allow-read=static"
+    "test": "deno task test-once --watch",
+    "test-once": "APP_TEST=1 deno test --allow-net --allow-env --allow-read=static"
   },
   "importMap": "./import_map.json",
   "compilerOptions": {

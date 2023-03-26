@@ -80,6 +80,16 @@ The best dependency is no dependency. Consider inlining code instead.
 You will need the following installed:
 
 - [Deno](https://deno.land/)
+- PostgreSQL
+  - User: `postgres`
+  - Password: `postgres`
+
+Create the databases:
+
+```sh
+createdb deno_starter
+createdb deno_starter_test
+```
 
 Copy `./secrets-example.env` to `./secrets.env` and fill in the values as
 directed by the comments.

@@ -4,6 +4,8 @@
     "lib/": "./lib/",
     "std/": "https://deno.land/std@0.180.0/",
     "jsx": "https://deno.land/x/jsx@v0.1.5/mod.ts",
-    "jsx/jsx-runtime": "https://deno.land/x/jsx@v0.1.5/mod.ts"
+    "postgres": "https://deno.land/x/postgres@v0.17.0/mod.ts",
+    "postgres/": "https://deno.land/x/postgres@v0.17.0/"
+
   }
 }
