@@ -3,10 +3,12 @@ import { serveDir } from "std/http/file_server.ts";
 import { Status } from "std/http/http_status.ts";
 import { logInfo } from "src/log.ts";
 import { JsonValue } from "std/json/mod.ts";
+import { login } from "src/web/authentication.tsx";
 
 const routes: Array<[URLPattern, Handler]> = Object.entries({
   "/": home,
   "/static/*": staticFile,
+  "/login": login,
   "/greet/:name": greet,
 }).map(([pathname, f]) => [new URLPattern({ pathname }), f]);
 
@@ -21,7 +23,7 @@ export type Params = { [key: string]: string };
 // export type Effects = {};
 export type Effects = Record<string, never>;
 
-export type Handler = (context: Context) => Promise<Response> | Response;
+export type Handler = (context: Context) => Promise<Response>;
 
 export async function handleRequest(
   request: Request,
@@ -75,6 +77,33 @@ export function json(
 ): Response {
   headers.set("content-type", "application/json; charset=utf-8");
   return new Response(JSON.stringify(json), { status, headers });
+}
+
+export type MethodHandlers = {
+  GET?: Handler;
+  POST?: Handler;
+  PUT?: Handler;
+  DELETE?: Handler;
+  PATCH?: Handler;
+};
+
+// Dispatch to a handler based on the HTTP method, returning a 405 if there is
+// no handler for the method.
+export function methodDispatch(
+  context: Context,
+  handlers: Record<string, Handler>,
+) {
+  const handler = handlers[context.request.method];
+  if (handler) {
+    return handler(context);
+  }
+  const content = (
+    <div>
+      There's nothing here... Expected HTTP methods are:
+      {" " + Object.keys(handlers).join(", ")}
+    </div>
+  );
+  return html(405, content);
 }
 
 function home(_context: Context) {
