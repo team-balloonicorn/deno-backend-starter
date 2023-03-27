@@ -11,6 +11,7 @@ A starter project for building a backend with Deno. It features:
 - A logger and logging of HTTP requests.
 - Dependency injection of effects to help with testing.
 - Loading of development secrets from a git-ignored `secrets.env` file.
+- A dockerfile for building an OCI container image.
 
 ## Table of contents
 
