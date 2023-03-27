@@ -1,8 +1,18 @@
 import { Fragment, h } from "jsx";
 import { Context, html, methodDispatch } from "../web.tsx";
 import { getCookies, setCookie } from "std/http/cookie.ts";
+import { logWarning } from "../log.ts";
 
 const USER_ID_COOKIE_NAME = "app-id";
+
+const USER_COOKIE_BASE = Object.freeze({
+  name: USER_ID_COOKIE_NAME,
+  value: "",
+  maxAge: 365 * 24 * 60 * 60,
+  secure: true,
+  httpOnly: true,
+  sameSite: "Lax",
+});
 
 export function login(
   context: Context,
@@ -20,7 +30,7 @@ function loginForm(
   const content = (
     <>
       <h1>Login</h1>
-      user id: {getUserIdFromCookie(context)}
+      user id: {context.currentUser}
       <form method="post">
         <label htmlFor="email">
           Email
@@ -49,6 +59,26 @@ class InvalidUserIdCookieError extends Error {
   }
 }
 
+export async function withUserFromSession(
+  context: Context,
+  next: (context: Context) => Promise<Response>,
+): Promise<Response> {
+  // TODO: get user
+  const id = getUserIdFromCookie(context);
+
+  // If the user id cookie is invalid then we handle the request as if it was
+  // not set, and delete the cookie with the response.
+  if (id instanceof InvalidUserIdCookieError) {
+    logWarning("user_id_cookie_invalid");
+    const response = await next(context);
+    deleteUserIdCookie(response.headers);
+    return response;
+  }
+
+  context.currentUser = parseInt(id || "") || undefined;
+  return next(context);
+}
+
 // Get the user id from the session cookie, if it exists.
 // If the signed cookie is set but is invalid (e.g. it's been tampered with),
 // then an error is returned.
@@ -61,19 +91,25 @@ function getUserIdFromCookie(
   return cookie;
 }
 
+function deleteUserIdCookie(
+  headers: Headers = new Headers(),
+): Headers {
+  setCookie(headers, {
+    ...USER_COOKIE_BASE,
+    value: "",
+    maxAge: 0,
+  });
+  return headers;
+}
+
 // TODO: sign session cookie
 function setUserIdCookie(
   userId: number,
   headers: Headers = new Headers(),
 ): Headers {
-  const oneYearInSeconds = 365 * 24 * 60 * 60;
   setCookie(headers, {
-    name: USER_ID_COOKIE_NAME,
+    ...USER_COOKIE_BASE,
     value: userId.toString(),
-    maxAge: oneYearInSeconds,
-    secure: true,
-    httpOnly: true,
-    sameSite: "Lax",
   });
   return headers;
 }

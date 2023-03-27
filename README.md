@@ -102,6 +102,8 @@ directed by the comments.
 - [The Deno standard libary](https://deno.land/std). (MIT)
 - [JSX](https://deno.land/x/jsx@v0.1.5), a micro templating library.
   (MIT)
+- [deno-postgres](https://deno.land/x/postgres), a PostgreSQL client.
+  (MIT)
 
 ## Deployment
 

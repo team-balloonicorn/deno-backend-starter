@@ -3,7 +3,7 @@ import { serveDir } from "std/http/file_server.ts";
 import { Status } from "std/http/http_status.ts";
 import { logInfo } from "src/log.ts";
 import { JsonValue } from "std/json/mod.ts";
-import { login } from "src/web/authentication.tsx";
+import { login, withUserFromSession } from "src/web/authentication.tsx";
 
 const routes: Array<[URLPattern, Handler]> = Object.entries({
   "/": home,
@@ -13,6 +13,7 @@ const routes: Array<[URLPattern, Handler]> = Object.entries({
 }).map(([pathname, f]) => [new URLPattern({ pathname }), f]);
 
 export type Context = {
+  currentUser: number | undefined;
   request: Request;
   params: Params;
   effects: Effects;
@@ -30,7 +31,13 @@ export async function handleRequest(
   effects: Effects,
 ): Promise<Response> {
   const before = Date.now();
-  const response = await router(request, effects);
+  const context: Context = {
+    request,
+    effects,
+    currentUser: undefined,
+    params: {},
+  };
+  const response = await withUserFromSession(context, router);
 
   logInfo({
     event: "responded",
@@ -43,14 +50,11 @@ export async function handleRequest(
 }
 
 export async function router(
-  request: Request,
-  effects: Effects,
+  context: Context,
 ): Promise<Response> {
-  const context: Context = { request, effects, params: {} };
-
   // Find a route that matches this request
   for (const [urlPattern, handler] of routes) {
-    const params = urlPattern.exec(request.url)?.pathname.groups;
+    const params = urlPattern.exec(context.request.url)?.pathname.groups;
     if (params) {
       context.params = params;
       return await handler(context);
@@ -125,4 +129,22 @@ function staticFile(context: Context) {
     urlRoot: "static",
     quiet: true,
   });
+}
+
+// Web browsers only support GET and POST, but we want to use PUT, PATCH, and
+// DELETE too.
+//
+// This function will override the request method of POST requests with a method
+// taken from the _method parameter, if it is set.
+//
+// GET requests are not overridden, for security reasons.
+//
+export function methodOverride(request: Request): Request {
+  if (request.method === "POST") {
+    const method = new URL(request.url).searchParams.get("_method");
+    if (method && ["PUT", "PATCH", "DELETE"].includes(method)) {
+      return new Request(request, { method: method });
+    }
+  }
+  return request;
 }

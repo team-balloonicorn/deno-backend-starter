@@ -17,6 +17,7 @@ export type Email = {
   body: string;
 };
 
+// Send an email using the ZeptoMail API.
 export async function sendEmail(
   email: Email,
   config: Config,
