@@ -1,4 +1,4 @@
-import { allUsers, getUser, insertUser } from "src/user.ts";
+import { allUsers, getUser, getUserByEmail, insertUser } from "src/user.ts";
 import { databaseTest } from "./helpers.ts";
 import { assertEquals, assertRejects } from "std/testing/asserts.ts";
 
@@ -32,9 +32,18 @@ databaseTest("user", async (db, t) => {
     );
   });
 
-  await t.step("get user", async () => {
+  await t.step("getUser", async () => {
     assertEquals(await getUser(db, -1), undefined);
     assertEquals(await getUser(db, id1), {
+      id: id1,
+      name: "One",
+      email: email1,
+    });
+  });
+
+  await t.step("getUserByEmail", async () => {
+    assertEquals(await getUserByEmail(db, "wibble"), undefined);
+    assertEquals(await getUserByEmail(db, email1), {
       id: id1,
       name: "One",
       email: email1,

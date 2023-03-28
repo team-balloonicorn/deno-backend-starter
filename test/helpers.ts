@@ -1,5 +1,4 @@
-import { Effects } from "src/web.tsx";
-import { Database } from "src/database.ts";
+import { Context, Database, Effects } from "src/common.ts";
 
 export const effects: Effects = Object.seal({});
 
@@ -43,6 +42,20 @@ $do$;
   );
 }
 
-export function newRequest(path: string, method = "GET"): Request {
-  return new Request(`http://localhost${path}`, { method });
+export function requestContext(
+  path: string,
+  method = "GET",
+  db?: Database,
+): Context {
+  const getDb = db ? () => db : () => {
+    throw new Error("No database connection provided for this test");
+  };
+  const request = new Request(`http://localhost${path}`, { method });
+  return {
+    request,
+    effects,
+    db: getDb,
+    params: {},
+    currentUser: undefined,
+  };
 }

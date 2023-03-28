@@ -1,7 +1,7 @@
-import { Fragment, h } from "jsx";
-import { Context, html, methodDispatch } from "../web.tsx";
+import { Context, html, methodDispatch, redirect } from "../web.tsx";
 import { getCookies, setCookie } from "std/http/cookie.ts";
-import { logWarning } from "../log.ts";
+import { Fragment, h, logInfo, logWarning } from "src/common.ts";
+import { getUser, getUserByEmail } from "src/user.ts";
 
 const USER_ID_COOKIE_NAME = "app-id";
 
@@ -17,20 +17,23 @@ const USER_COOKIE_BASE = Object.freeze({
 export function login(
   context: Context,
 ): Promise<Response> {
+  console.log("login", context.request.method);
   return methodDispatch(context, {
-    GET: loginForm,
-    POST: loginFormSubmitted,
+    GET: showLoginForm,
+    POST: handleLoginFormSubmission,
+    DELETE: logout,
   });
 }
 
-function loginForm(
+// TODO: test
+function showLoginForm(
   context: Context,
 ): Promise<Response> {
   // TODO: redirect away if already logged in
   const content = (
     <>
       <h1>Login</h1>
-      user id: {context.currentUser}
+      user: {context.currentUser?.name}
       <form method="post">
         <label htmlFor="email">
           Email
@@ -38,18 +41,34 @@ function loginForm(
         </label>
         <input type="submit" value="Login" />
       </form>
+      <form method="post" action="?_method=DELETE">
+        <input type="submit" value="Logout" />
+      </form>
     </>
   );
   return html(200, content);
 }
 
-function loginFormSubmitted(
-  context: Context,
-): Promise<Response> {
-  // TODO: Actually do auth rather than just setting the cookie
+// TODO: test
+async function handleLoginFormSubmission(context: Context): Promise<Response> {
+  const formData = await context.request.formData();
+  const email = formData.get("email")?.toString() || "";
+  const user = await getUserByEmail(context.db(), email);
+
+  if (!user) {
+    // TODO: re-render form
+    return html(200, <h1>No account found for that email, sorry</h1>);
+  }
+
+  logInfo({ event: "user_logged_in", id: user.id });
   const content = <h1>Login</h1>;
-  const headers = setUserIdCookie(123);
+  const headers = setUserIdCookie(user.id);
   return html(200, content, headers);
+}
+
+// TODO: test
+async function logout(context: Context): Promise<Response> {
+  return await redirect("/login", deleteUserIdCookie());
 }
 
 class InvalidUserIdCookieError extends Error {
@@ -63,19 +82,35 @@ export async function withUserFromSession(
   context: Context,
   next: (context: Context) => Promise<Response>,
 ): Promise<Response> {
-  // TODO: get user
+  const responseToInvalidCookie = async () => {
+    const response = await next(context);
+    deleteUserIdCookie(response.headers);
+    return response;
+  };
+
   const id = getUserIdFromCookie(context);
 
   // If the user id cookie is invalid then we handle the request as if it was
   // not set, and delete the cookie with the response.
   if (id instanceof InvalidUserIdCookieError) {
     logWarning("user_id_cookie_invalid");
-    const response = await next(context);
-    deleteUserIdCookie(response.headers);
-    return response;
+    return responseToInvalidCookie();
   }
 
-  context.currentUser = parseInt(id || "") || undefined;
+  // No cookie, continue without authentication.
+  if (id === undefined) {
+    return next(context);
+  }
+
+  const user = await getUser(context.db(), id);
+
+  // The cookie was valid but no user was found for the id.
+  if (!user) {
+    logWarning({ event: "user_not_found_for_cookie", id });
+    return responseToInvalidCookie();
+  }
+
+  context.currentUser = user;
   return next(context);
 }
 
@@ -84,11 +119,11 @@ export async function withUserFromSession(
 // then an error is returned.
 function getUserIdFromCookie(
   context: Context,
-): string | undefined | InvalidUserIdCookieError {
+): number | undefined | InvalidUserIdCookieError {
   const cookie = getCookies(context.request.headers)[USER_ID_COOKIE_NAME];
   if (!cookie) return undefined;
   // TODO: verify cookie signature
-  return cookie;
+  return parseInt(cookie) || undefined;
 }
 
 function deleteUserIdCookie(

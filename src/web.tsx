@@ -1,9 +1,10 @@
 import { h, Node, renderToString } from "jsx";
 import { serveDir } from "std/http/file_server.ts";
 import { Status } from "std/http/http_status.ts";
-import { logInfo } from "src/log.ts";
+import { Database, logInfo } from "src/common.ts";
 import { JsonValue } from "std/json/mod.ts";
 import { login, withUserFromSession } from "src/web/authentication.tsx";
+import { User } from "src/user.ts";
 
 const routes: Array<[URLPattern, Handler]> = Object.entries({
   "/": home,
@@ -13,7 +14,8 @@ const routes: Array<[URLPattern, Handler]> = Object.entries({
 }).map(([pathname, f]) => [new URLPattern({ pathname }), f]);
 
 export type Context = {
-  currentUser: number | undefined;
+  currentUser: User | undefined;
+  db: () => Database;
   request: Request;
   params: Params;
   effects: Effects;
@@ -27,23 +29,17 @@ export type Effects = Record<string, never>;
 export type Handler = (context: Context) => Promise<Response>;
 
 export async function handleRequest(
-  request: Request,
-  effects: Effects,
+  context: Context,
 ): Promise<Response> {
   const before = Date.now();
-  const context: Context = {
-    request,
-    effects,
-    currentUser: undefined,
-    params: {},
-  };
+  context.request = methodOverride(context.request);
   const response = await withUserFromSession(context, router);
 
   logInfo({
     event: "responded",
     status: response.status,
-    method: request.method,
-    url: request.url,
+    method: context.request.method,
+    url: context.request.url,
     ms: Date.now() - before,
   });
   return response;
@@ -72,6 +68,17 @@ export async function html(
 ): Promise<Response> {
   headers.set("content-type", "text/html; charset=utf-8");
   return new Response(await renderToString(node), { status, headers });
+}
+
+export function redirect(
+  location: string,
+  headers: Headers = new Headers(),
+): Response {
+  headers.set("location", location);
+  return new Response(`You are being redirected to ${location}`, {
+    status: 302,
+    headers,
+  });
 }
 
 export function json(

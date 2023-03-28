@@ -38,3 +38,15 @@ export async function getUser(
   `;
   return await db.queryOne<User>(sql, { id });
 }
+
+export async function getUserByEmail(
+  db: Database,
+  email: string,
+): Promise<User | undefined> {
+  const sql = `
+    select id, name, email
+    from users
+    where email = $email
+  `;
+  return await db.queryOne<User>(sql, { email });
+}

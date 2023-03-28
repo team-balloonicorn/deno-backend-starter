@@ -1,22 +1,22 @@
 import { assertEquals, assertStringIncludes } from "std/testing/asserts.ts";
 import { handleRequest } from "src/web.tsx";
-import { effects, newRequest } from "./helpers.ts";
+import { requestContext } from "./helpers.ts";
 
 Deno.test("GET /", async () => {
-  const request = newRequest("/");
-  const response = await handleRequest(request, effects);
+  const context = requestContext("/");
+  const response = await handleRequest(context);
   assertEquals(response.status, 200);
 });
 
 Deno.test("GET /unknown", async () => {
-  const request = newRequest("/unknown");
-  const response = await handleRequest(request, effects);
+  const context = requestContext("/unknown");
+  const response = await handleRequest(context);
   assertEquals(response.status, 404);
 });
 
 Deno.test("GET /static/styles.css", async () => {
-  const request = newRequest("/static/styles.css");
-  const response = await handleRequest(request, effects);
+  const context = requestContext("/static/styles.css");
+  const response = await handleRequest(context);
   assertEquals(response.status, 200);
   assertEquals(response.headers.get("content-type"), "text/css; charset=UTF-8");
   const css = await response.text();
@@ -24,13 +24,13 @@ Deno.test("GET /static/styles.css", async () => {
 });
 
 Deno.test("GET /static/unknown", async () => {
-  const request = newRequest("/static/unknown");
-  const response = await handleRequest(request, effects);
+  const context = requestContext("/static/unknown");
+  const response = await handleRequest(context);
   assertEquals(response.status, 404);
 });
 
 Deno.test("GET /static/../deno.json", async () => {
-  const request = newRequest("/static/../deno.json");
-  const response = await handleRequest(request, effects);
+  const context = requestContext("/static/../deno.json");
+  const response = await handleRequest(context);
   assertEquals(response.status, 404);
 });
