@@ -12,6 +12,7 @@ create table users
 ( id integer primary key generated always as identity
   
 , name character varying(255) not null
+    constraint name_length check (char_length(name) > 0)
 
 , email character varying(255) not null
     constraint email_unique unique
