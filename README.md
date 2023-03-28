@@ -89,8 +89,7 @@ You will need the following installed:
 Create the databases:
 
 ```sh
-createdb deno_starter
-createdb deno_starter_test
+bin/setup-development-databases.sh
 ```
 
 Copy `./secrets-example.env` to `./secrets.env` and fill in the values as
